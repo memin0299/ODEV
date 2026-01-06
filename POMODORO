@@ -1,5 +1,4 @@
 POMODORO ODEV
-package com.example.focusappfinal;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
