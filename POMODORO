@@ -1,0 +1,184 @@
+POMODORO ODEV
+package com.example.focusappfinal;
+
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText editDuration;
+    private Button startButton;
+    private TextView tvStatus;
+    private ImageView imageTree;
+    private CountDownTimer countDownTimer;
+    private boolean isRunning = false;
+    private long remainingTime;
+    private int treeGrowthStage = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        editDuration = findViewById(R.id.editDuration);
+        startButton = findViewById(R.id.startButton);
+        tvStatus = findViewById(R.id.tvStatus);
+        imageTree = findViewById(R.id.imageTree);
+
+    }
+
+    public void onStartButtonClick(View view){
+        if(isRunning){
+            stopTimer();
+        }else {
+            startTimer();
+        }
+    }
+
+
+    private void startTimer() {
+        String durationStr = editDuration.getText().toString();
+        if (durationStr.isEmpty()) {
+            tvStatus.setText("Lütfen bir süre girin.");
+            return;
+        }
+
+        long duration = Long.parseLong(durationStr) * 60 * 1000; // Dakikayı milisaniyeye çevir
+        remainingTime = duration;
+
+        countDownTimer = new CountDownTimer(duration, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                remainingTime = millisUntilFinished;
+                int minutes = (int) (millisUntilFinished / 1000) / 60;
+                int seconds = (int) (millisUntilFinished / 1000) % 60;
+                tvStatus.setText(String.format("Kalan Süre: %02d:%02d", minutes, seconds));
+            }
+
+            @Override
+            public void onFinish() {
+                tvStatus.setText("Tebrikler! Süre tamamlandı.");
+                growTree();
+                isRunning = false;
+                startButton.setText("Başlat");
+            }
+        }.start();
+
+        isRunning = true;
+        startButton.setText("Durdur");
+    }
+
+    private void stopTimer() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        tvStatus.setText("Duraklatıldı.");
+        isRunning = false;
+        startButton.setText("Başlat");
+    }
+
+    private void growTree() {
+        treeGrowthStage++;
+        switch (treeGrowthStage) {
+            case 1:
+                imageTree.setImageResource(R.drawable.ic_tree_stage_1);
+                break;
+            case 2:
+                imageTree.setImageResource(R.drawable.ic_tree_stage_2);
+                break;
+            case 3:
+                imageTree.setImageResource(R.drawable.ic_tree_stage_3);
+                break;
+            default:
+                imageTree.setImageResource(R.drawable.ic_tree_stage_4);
+                tvStatus.setText("Ağacınız tam anlamıyla büyüdü!");
+                break;
+        }
+    }
+}
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="match_parent"
+                android:layout_height="73dp"
+                android:text="odaklan"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="match_parent"
+                android:layout_height="79dp"
+                android:textSize="34sp" />
+
+            <EditText
+                android:id="@+id/editDuration"
+                android:layout_width="match_parent"
+                android:layout_height="86dp"
+                android:ems="10"
+                android:inputType="number"
+                android:text="focus time minutes" />
+
+            <Button
+                android:id="@+id/startButton"
+                android:layout_width="match_parent"
+                android:layout_height="161dp"
+                android:onClick="onStartButtonClick"
+                android:text="Start" />
+
+            <ImageView
+                android:id="@+id/imageTree"
+                android:layout_width="match_parent"
+                android:layout_height="254dp"
+                tools:srcCompat="@tools:sample/avatars" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
